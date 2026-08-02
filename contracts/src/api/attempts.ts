@@ -1,8 +1,8 @@
-import type { Attempt, ClientManagedAttemptStatus } from "../domain/attempt";
-import type { EntityId, FrameworkId, IsoDateTime } from "../domain/common";
-import type { Evaluation } from "../domain/evaluation";
-import type { Transcript } from "../domain/transcript";
-import type { ApiSuccess } from "./common";
+import type { Attempt, ClientManagedAttemptStatus } from "../domain/attempt.js";
+import type { EntityId, FrameworkId, IsoDateTime } from "../domain/common.js";
+import type { Evaluation } from "../domain/evaluation.js";
+import type { Transcript } from "../domain/transcript.js";
+import type { ApiSuccess } from "./common.js";
 
 export const ATTEMPT_API = {
   collection: "/v1/attempts",
@@ -71,4 +71,3 @@ export type RequestEvaluationRequest = {
 export type RequestEvaluationResponse = ApiSuccess<Attempt>;
 
 export type DeleteAttemptResponse = void;
-

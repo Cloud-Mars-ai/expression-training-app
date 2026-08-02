@@ -1,4 +1,4 @@
-import type { EntityId, FrameworkId, IsoDateTime } from "./common";
+import type { EntityId, FrameworkId, IsoDateTime } from "./common.js";
 
 export const ATTEMPT_STATUSES = [
   "created",
@@ -64,4 +64,3 @@ export type Attempt = {
   readyAt?: IsoDateTime;
   deletedAt?: IsoDateTime;
 };
-

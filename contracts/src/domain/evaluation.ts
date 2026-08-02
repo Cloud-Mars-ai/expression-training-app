@@ -1,4 +1,4 @@
-import type { EntityId, EvaluationDimensionId, IsoDateTime } from "./common";
+import type { EntityId, EvaluationDimensionId, IsoDateTime } from "./common.js";
 
 export type EvidenceReference = {
   transcriptId: EntityId;
@@ -84,4 +84,3 @@ export type UnscorableEvaluation = {
 };
 
 export type Evaluation = ScorableEvaluation | UnscorableEvaluation;
-

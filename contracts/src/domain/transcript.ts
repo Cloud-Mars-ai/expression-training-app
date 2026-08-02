@@ -1,4 +1,4 @@
-import type { EntityId, IsoDateTime } from "./common";
+import type { EntityId, IsoDateTime } from "./common.js";
 
 export type TranscriptStatus = "provider-draft" | "user-reviewed";
 
@@ -32,4 +32,3 @@ export type Transcript = {
   updatedAt: IsoDateTime;
   reviewedAt?: IsoDateTime;
 };
-

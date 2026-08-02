@@ -1,4 +1,4 @@
-import type { AttemptStatus } from "../domain/attempt";
+import type { AttemptStatus } from "../domain/attempt.js";
 
 export const ATTEMPT_TRANSITIONS = {
   created: ["permission-check", "cancelled", "deleted"],
@@ -23,4 +23,3 @@ export const NEVER_SCORE_ATTEMPT_STATUSES = [
   "unscorable",
   "deleted",
 ] as const satisfies readonly AttemptStatus[];
-
