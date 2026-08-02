@@ -8,9 +8,12 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@expression-training/contracts": "0.1.0",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",
@@ -21,17 +24,20 @@
     "@eslint/js": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@testing-library/react": "16.3.2",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "autoprefixer": "latest",
     "eslint": "latest",
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
+    "happy-dom": "20.11.1",
     "playwright-core": "^1.62.1",
     "postcss": "latest",
     "tailwindcss": "^3.4.17",
     "typescript": "latest",
     "typescript-eslint": "latest",
+    "vitest": "4.1.10",
     "vite": "latest"
   }
 }
