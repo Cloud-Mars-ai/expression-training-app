@@ -5,7 +5,8 @@
 ## 检查结果
 
 - 检查目录：`D:\轨迹\大学\表达能力训练APP\试用版1`。
-- Git：当前不是 Git 仓库，没有可用的 commit 或工作区差异基线。
+- 初始检查时不是 Git 仓库；串行冻结完成后已在本目录初始化 `main` 分支。
+- 共同基础基线提交：`8647d2a`（`chore: freeze shared contracts and project boundaries`）。
 - 原前端目录：`source/`，已在同一目标目录内原样移动为 `frontend/`。
 - 现有成品：`app/`，本地启动器不依赖开发目录。
 - 现有测试脚本：无单元测试、API 测试或 E2E 测试脚本。
