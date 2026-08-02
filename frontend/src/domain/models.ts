@@ -1,5 +1,6 @@
 export type CapabilityId = "retelling" | "structure" | "scenario" | "impromptu";
-export type FrameworkId = "PREP" | "STAR";
+export type FrameworkId = "PREP" | "STAR" | "SCQA";
+export type InputMode = "voice" | "text";
 export type RecordingState = "idle" | "recording" | "paused" | "completed";
 
 export type UserProfile = {
@@ -43,11 +44,12 @@ export type AttemptState = "created" | "preparing" | "recording" | "paused" | "p
 
 export type Attempt = {
   id: string;
-  schemaVersion: 1;
+  schemaVersion: 2;
   userId: string;
   exerciseId: string;
   exerciseVersion: string;
   frameworkId: FrameworkId;
+  inputMode: InputMode;
   stage: AttemptState;
   recordingState: RecordingState;
   preparationRemaining: number;

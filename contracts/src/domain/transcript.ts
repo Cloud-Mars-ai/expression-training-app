@@ -1,4 +1,4 @@
-import type { EntityId, IsoDateTime } from "./common.js";
+import type { EntityId, InputMode, IsoDateTime } from "./common.js";
 
 export type TranscriptStatus = "provider-draft" | "user-reviewed";
 
@@ -18,9 +18,10 @@ export type TranscriptProviderInfo = {
 };
 
 export type Transcript = {
-  schemaVersion: 1;
+  schemaVersion: 2;
   id: EntityId;
   attemptId: EntityId;
+  inputMode: InputMode;
   status: TranscriptStatus;
   revision: number;
   language: "zh-CN";

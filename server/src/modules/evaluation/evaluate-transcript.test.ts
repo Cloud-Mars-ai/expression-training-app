@@ -146,6 +146,39 @@ describe("evaluateTranscript", () => {
     });
   });
 
+  it("允许围绕题目正常讨论焦虑，但不把它当作用户心理状态推断", async () => {
+    const transcript = createReviewedTranscriptFixture();
+    const good = await new MockEvaluationProvider().evaluate({
+      attemptId: STRUCTURED_EXPRESSION_ATTEMPT_ID,
+      transcript,
+      rubric: structuredExpressionRubricFixture,
+    });
+    expect(good.kind).toBe("scorable");
+    if (good.kind !== "scorable") return;
+
+    const topical: EvaluationProviderResult = {
+      kind: "scorable",
+      evaluation: {
+        ...good.evaluation,
+        priorityIssue: {
+          ...good.evaluation.priorityIssue,
+          whyNow: "回答提到了求职焦虑这一社会议题，但还可以补充它出现的条件与边界。",
+        },
+      },
+    };
+    const provider: EvaluationProvider = {
+      providerId: "topical-provider",
+      evaluate: vi.fn(async () => topical),
+    };
+
+    await expect(evaluateTranscript({
+      attemptId: STRUCTURED_EXPRESSION_ATTEMPT_ID,
+      transcript,
+      rubric: structuredExpressionRubricFixture,
+      provider,
+    })).resolves.toMatchObject({ status: "scorable" });
+  });
+
   it("Provider 技术失败作为异常返回，不创建 Evaluation", async () => {
     await expect(evaluateTranscript({
       attemptId: STRUCTURED_EXPRESSION_ATTEMPT_ID,

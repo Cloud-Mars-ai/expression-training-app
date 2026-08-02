@@ -1,0 +1,24 @@
+[Unit]
+Description=Expression Training API
+After=network-online.target expression-training-asr.service
+Wants=network-online.target expression-training-asr.service
+
+[Service]
+Type=simple
+User=expression-training
+Group=expression-training
+WorkingDirectory=/opt/expression-training/current
+EnvironmentFile=/etc/expression-training/app.env
+ExecStart=/usr/bin/node /opt/expression-training/current/node_modules/tsx/dist/cli.mjs server/src/index.ts
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/expression-training
+
+[Install]
+WantedBy=multi-user.target

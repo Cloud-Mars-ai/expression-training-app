@@ -18,23 +18,10 @@ import {
 const DEFAULT_MINIMUM_TRANSCRIPT_CONFIDENCE = 0.55;
 const DEFAULT_MINIMUM_EVALUATION_CONFIDENCE = 0.55;
 const DEFAULT_MINIMUM_SPEECH_CHARACTERS = 24;
-const PROHIBITED_INFERENCE_TERMS = [
-  "性格",
-  "人格",
-  "焦虑",
-  "智力",
-  "智商",
-  "聪明",
-  "心理状态",
-  "心理健康",
-  "抑郁",
-  "就业能力",
-  "录用概率",
-  "personality",
-  "anxiety",
-  "intelligence",
-  "mental health",
-  "employability",
+const PROHIBITED_INFERENCE_PATTERNS = [
+  /(?:从|根据|通过|由).{0,18}(?:声音|音量|语速|停顿|语气|口音|发音|表达速度).{0,22}(?:判断|推断|说明|表明|证明|反映|意味着).{0,14}(?:你|用户|答题者).{0,8}(?:性格|人格|焦虑|智力|智商|聪明|心理状态|心理健康|抑郁|就业能力|录用概率)/u,
+  /(?:你|用户|答题者).{0,8}(?:性格|人格|焦虑|智力|智商|聪明|心理状态|心理健康|抑郁|就业能力|录用概率).{0,22}(?:源于|来自|取决于|可以从|能够从).{0,14}(?:声音|音量|语速|停顿|语气|口音|发音|表达速度)/u,
+  /(?:voice|volume|speaking rate|pause|tone|accent|pronunciation).{0,40}(?:shows?|proves?|indicates?|means?|infer).{0,30}(?:personality|anxiety|intelligence|mental health|employability)/iu,
 ] as const;
 
 export class EvaluationInputError extends Error {
@@ -152,11 +139,9 @@ function generatedFeedbackText(draft: ScorableEvaluationDraft): string[] {
 
 function validateNoProhibitedInference(draft: ScorableEvaluationDraft): void {
   const generatedText = generatedFeedbackText(draft).join("\n").toLocaleLowerCase("zh-CN");
-  const matchedTerm = PROHIBITED_INFERENCE_TERMS.find((term) =>
-    generatedText.includes(term.toLocaleLowerCase("zh-CN")),
-  );
-  if (matchedTerm) {
-    throw new Error(`评分反馈包含禁止推断：${matchedTerm}`);
+  const matchedPattern = PROHIBITED_INFERENCE_PATTERNS.find((pattern) => pattern.test(generatedText));
+  if (matchedPattern) {
+    throw new Error("评分反馈包含从语音表现推断人格、心理、智力或就业能力的内容。");
   }
 }
 

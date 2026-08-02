@@ -117,4 +117,13 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX idempotency_expiry_idx ON idempotency_keys(expires_at);
     `,
   },
+  {
+    id: 2,
+    name: "attempt_input_mode",
+    sql: `
+      ALTER TABLE attempts ADD COLUMN input_mode TEXT NOT NULL DEFAULT 'voice';
+      ALTER TABLE transcripts ADD COLUMN input_mode TEXT NOT NULL DEFAULT 'voice';
+      CREATE INDEX attempts_owner_input_mode_idx ON attempts(owner_id, input_mode, created_at DESC);
+    `,
+  },
 ] as const;

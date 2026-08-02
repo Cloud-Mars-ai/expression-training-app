@@ -5,6 +5,7 @@ import type {
   AudioAssetSummary,
   CreateAttemptRequest,
   ProgressDisposition,
+  InputMode,
 } from "@expression-training/contracts";
 import type { SqliteDatabase } from "./database.js";
 
@@ -13,7 +14,8 @@ type AttemptRow = {
   owner_id: string;
   exercise_id: string;
   exercise_version_id: string;
-  framework_id: "PREP" | "STAR" | null;
+  framework_id: "PREP" | "STAR" | "SCQA" | null;
+  input_mode: InputMode;
   status: AttemptStatus;
   status_version: number;
   retry_of_attempt_id: string | null;
@@ -78,10 +80,10 @@ export class AttemptRepository {
     this.database
       .prepare(`
         INSERT INTO attempts (
-          id, owner_id, exercise_id, exercise_version_id, framework_id,
+          id, owner_id, exercise_id, exercise_version_id, framework_id, input_mode,
           status, status_version, retry_of_attempt_id, focus_issue_id,
           progress_disposition, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, 'created', 1, ?, ?, 'pending', ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, 'created', 1, ?, ?, 'pending', ?, ?)
       `)
       .run(
         input.id,
@@ -89,6 +91,7 @@ export class AttemptRepository {
         input.exerciseId,
         input.exerciseVersionId,
         input.frameworkId ?? null,
+        input.inputMode,
         input.retryOfAttemptId ?? null,
         input.focusIssueId ?? null,
         input.now,
@@ -104,6 +107,15 @@ export class AttemptRepository {
       .get(id, ownerId) as AttemptRow | undefined;
     if (!row) return null;
     return this.mapAttempt(row, this.findAudioRecord(id));
+  }
+
+  findByStatuses(statuses: AttemptStatus[]): Attempt[] {
+    if (statuses.length === 0) return [];
+    const placeholders = statuses.map(() => "?").join(", ");
+    const rows = this.database
+      .prepare(`${ATTEMPT_SELECT} WHERE a.status IN (${placeholders}) AND a.deleted_at IS NULL`)
+      .all(...statuses) as AttemptRow[];
+    return rows.map((row) => this.mapAttempt(row, this.findAudioRecord(row.id)));
   }
 
   requireOwned(id: string, ownerId: string): Attempt {
@@ -231,12 +243,13 @@ export class AttemptRepository {
         : null;
 
     return {
-      schemaVersion: 2,
+      schemaVersion: 3,
       id: row.id,
       ownerId: row.owner_id,
       exerciseId: row.exercise_id,
       exerciseVersionId: row.exercise_version_id,
       ...(row.framework_id ? { frameworkId: row.framework_id } : {}),
+      inputMode: row.input_mode,
       status: row.status,
       statusVersion: row.status_version,
       ...(row.retry_of_attempt_id ? { retryOfAttemptId: row.retry_of_attempt_id } : {}),

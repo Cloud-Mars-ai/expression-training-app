@@ -1,0 +1,25 @@
+[Unit]
+Description=Expression Training Faster-Whisper ASR
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=expression-training
+Group=expression-training
+WorkingDirectory=/opt/expression-training/current
+EnvironmentFile=/etc/expression-training/asr.env
+ExecStart=/opt/expression-training/asr-venv/bin/python -m uvicorn server.asr.local_asr_server:app --host 127.0.0.1 --port 9000
+Restart=always
+RestartSec=5
+TimeoutStartSec=300
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/expression-training
+
+[Install]
+WantedBy=multi-user.target

@@ -9,6 +9,7 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e:smoke": "node scripts/e2e-smoke.mjs",
     "test:watch": "vitest",
     "preview": "vite preview"
   },

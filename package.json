@@ -9,12 +9,17 @@
     "server"
   ],
   "scripts": {
+    "sync:topics": "node scripts/sync-research-topics.mjs",
+    "verify:deepseek": "tsx server/scripts/verify-deepseek.ts",
     "build:frontend": "npm run build --workspace @expression-training/frontend",
     "lint:frontend": "npm run lint --workspace @expression-training/frontend",
     "test:frontend": "npm run test --workspace @expression-training/frontend",
     "typecheck:contracts": "npm run typecheck --workspace @expression-training/contracts",
     "typecheck:server": "npm run typecheck --workspace @expression-training/server",
     "test:server": "npm run test --workspace @expression-training/server",
-    "test:api": "npm run test:api --workspace @expression-training/server"
+    "test:api": "npm run test:api --workspace @expression-training/server",
+    "test:e2e:smoke": "npm run test:e2e:smoke --workspace @expression-training/frontend",
+    "dev:server": "npm run dev --workspace @expression-training/server",
+    "start:server": "npm run start --workspace @expression-training/server"
   }
 }

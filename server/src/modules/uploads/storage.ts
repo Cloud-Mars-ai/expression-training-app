@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { mkdir, rename, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, extname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { extensionForMimeType, type SupportedAudioMimeType } from "./config.js";
@@ -7,6 +7,10 @@ import { extensionForMimeType, type SupportedAudioMimeType } from "./config.js";
 export interface AudioStorage {
   put(input: { storageKey: string; data: Buffer }): Promise<void>;
   delete(storageKey: string): Promise<void>;
+}
+
+export interface ReadableAudioStorage extends AudioStorage {
+  read(storageKey: string): Promise<Buffer>;
 }
 
 export function defaultAudioStorageRoot(): string {
@@ -23,7 +27,7 @@ export function createAudioStorageKey(input: {
   return `${ownerPartition}/${input.attemptId}/${input.audioAssetId}.${extensionForMimeType(input.mimeType)}`;
 }
 
-export class LocalAudioStorage implements AudioStorage {
+export class LocalAudioStorage implements ReadableAudioStorage {
   readonly rootDirectory: string;
 
   constructor(rootDirectory = defaultAudioStorageRoot()) {
@@ -47,6 +51,10 @@ export class LocalAudioStorage implements AudioStorage {
     const target = this.resolveStorageKey(storageKey);
     await rm(target, { force: true });
     await this.removeEmptyParents(dirname(target));
+  }
+
+  async read(storageKey: string): Promise<Buffer> {
+    return readFile(this.resolveStorageKey(storageKey));
   }
 
   private resolveStorageKey(storageKey: string): string {

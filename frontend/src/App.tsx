@@ -14,6 +14,8 @@ import { TechnicalFailurePage } from "./pages/TechnicalFailurePage";
 import { TrainingResultPage } from "./pages/TrainingResultPage";
 import { TrainingPage } from "./pages/TrainingPage";
 import { TrainingCapabilityPlaceholder } from "./pages/TrainingCapabilityPlaceholder";
+import { TranscriptReviewPage } from "./pages/TranscriptReviewPage";
+import { AskOneMoreCoursePage } from "./pages/AskOneMoreCoursePage";
 
 export default function App() {
   return (
@@ -26,6 +28,7 @@ export default function App() {
         <Route path="training/:capability" element={<TrainingCapabilityPlaceholder />} />
         <Route path="growth" element={<GrowthPage />} />
         <Route path="me" element={<MePage />} />
+        <Route path="microcourse/ask-one-more" element={<AskOneMoreCoursePage />} />
       </Route>
       <Route element={<FocusShell />}>
         <Route path="focus/:stage" element={<StructuredTrainingFocusPage />} />
@@ -34,6 +37,7 @@ export default function App() {
         <Route path="exercise/:exerciseId" element={<StructuredExerciseDetailPage />} />
         <Route path="exercise/:exerciseId/framework" element={<FrameworkSelectionPage />} />
         <Route path="result/:attemptId" element={<TrainingResultPage />} />
+        <Route path="attempt/:attemptId/transcript" element={<TranscriptReviewPage />} />
         <Route path="technical-error/:attemptId" element={<TechnicalFailurePage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />

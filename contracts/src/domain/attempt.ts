@@ -1,8 +1,9 @@
-import type { EntityId, FrameworkId, IsoDateTime } from "./common.js";
+import type { EntityId, FrameworkId, InputMode, IsoDateTime } from "./common.js";
 
 export const ATTEMPT_STATUSES = [
   "created",
   "permission-check",
+  "text-entry",
   "recording",
   "uploading",
   "transcribing",
@@ -16,7 +17,7 @@ export const ATTEMPT_STATUSES = [
 ] as const;
 
 export type AttemptStatus = (typeof ATTEMPT_STATUSES)[number];
-export type ClientManagedAttemptStatus = "permission-check" | "recording" | "cancelled";
+export type ClientManagedAttemptStatus = "permission-check" | "text-entry" | "recording" | "cancelled";
 export type ProgressDisposition = "pending" | "counted" | "not-counted";
 
 export type AttemptFailureCode =
@@ -44,12 +45,13 @@ export type AudioAssetSummary = {
 };
 
 export type Attempt = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   id: EntityId;
   ownerId: EntityId;
   exerciseId: EntityId;
   exerciseVersionId: EntityId;
   frameworkId?: FrameworkId;
+  inputMode: InputMode;
   status: AttemptStatus;
   statusVersion: number;
   retryOfAttemptId?: EntityId;

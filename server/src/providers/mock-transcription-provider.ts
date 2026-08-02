@@ -22,7 +22,7 @@ const DEFAULT_TEXTS = [
 ] as const;
 
 function createDefaultResult(request: TranscriptionProviderRequest): TranscriptionProviderResult {
-  const usableDuration = Math.max(request.audio.durationMs, DEFAULT_TEXTS.length * 1_000);
+  const usableDuration = request.audio.durationMs;
   const segmentDuration = Math.floor(usableDuration / DEFAULT_TEXTS.length);
   const segments = DEFAULT_TEXTS.map((text, index) => {
     const startMs = index * segmentDuration;

@@ -1,8 +1,9 @@
 import type { AttemptStatus } from "../domain/attempt.js";
 
 export const ATTEMPT_TRANSITIONS = {
-  created: ["permission-check", "cancelled", "deleted"],
+  created: ["permission-check", "text-entry", "cancelled", "deleted"],
   "permission-check": ["recording", "cancelled", "technical-failure", "deleted"],
+  "text-entry": ["transcript-review", "cancelled", "deleted"],
   recording: ["uploading", "cancelled", "technical-failure", "deleted"],
   uploading: ["transcribing", "cancelled", "technical-failure", "deleted"],
   transcribing: ["transcript-review", "unscorable", "cancelled", "technical-failure", "deleted"],
@@ -10,7 +11,7 @@ export const ATTEMPT_TRANSITIONS = {
   evaluating: ["ready", "unscorable", "technical-failure", "deleted"],
   ready: ["deleted"],
   cancelled: ["deleted"],
-  "technical-failure": ["deleted"],
+  "technical-failure": ["evaluating", "deleted"],
   unscorable: ["deleted"],
   deleted: [],
 } as const satisfies Record<AttemptStatus, readonly AttemptStatus[]>;

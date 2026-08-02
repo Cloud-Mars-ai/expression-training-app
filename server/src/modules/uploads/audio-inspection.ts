@@ -166,42 +166,104 @@ function inspectWebmDuration(buffer: Buffer): number {
   // duration and remains independent of client metadata.
   const clusterMarker = Buffer.from([0x1f, 0x43, 0xb6, 0x75]);
   let clusterOffset = buffer.indexOf(clusterMarker);
-  let maxTimecode = 0;
+  let minimumTimecode = Number.POSITIVE_INFINITY;
+  let maximumTimecode = Number.NEGATIVE_INFINITY;
   while (clusterOffset >= 0) {
     const nextCluster = buffer.indexOf(clusterMarker, clusterOffset + clusterMarker.length);
-    const clusterEnd = nextCluster >= 0 ? nextCluster : buffer.length;
     const clusterSize = readEbmlVint(buffer, clusterOffset + clusterMarker.length);
     const contentOffset = clusterOffset + clusterMarker.length + (clusterSize?.length ?? 1);
+    const declaredEnd = clusterSize ? contentOffset + clusterSize.value : Number.POSITIVE_INFINITY;
+    const clusterEnd = declaredEnd <= buffer.length ? declaredEnd : nextCluster >= 0 ? nextCluster : buffer.length;
     if (contentOffset < clusterEnd) {
       const cluster = buffer.subarray(contentOffset, clusterEnd);
-      const baseTimecode = findEbmlNumber(cluster, [0xe7], "uint") ?? 0;
-      maxTimecode = Math.max(maxTimecode, baseTimecode + findLastBlockTimecode(cluster));
+      const { baseTimecode, range } = inspectClusterTimecodes(cluster);
+      if (range) {
+        minimumTimecode = Math.min(minimumTimecode, baseTimecode + range.minimum);
+        maximumTimecode = Math.max(maximumTimecode, baseTimecode + range.maximum);
+      }
     }
     clusterOffset = nextCluster;
   }
-  if (maxTimecode <= 0) {
+  const elapsedTimecode = maximumTimecode - minimumTimecode;
+  if (!Number.isFinite(elapsedTimecode) || elapsedTimecode <= 0) {
     throw new AudioInspectionError("duration-unavailable", "WebM 缺少可用的 Duration 或块时间码。");
   }
-  return Math.round((maxTimecode * timecodeScale) / 1_000_000);
+  return Math.round((elapsedTimecode * timecodeScale) / 1_000_000);
 }
 
-function findLastBlockTimecode(cluster: Buffer): number {
-  let maxRelativeTimecode = 0;
-  for (const marker of [0xa3, 0xa1]) {
-    let offset = cluster.indexOf(marker);
-    while (offset >= 0) {
-      const size = readEbmlVint(cluster, offset + 1);
-      if (size) {
-        const blockOffset = offset + 1 + size.length;
-        const trackNumber = readEbmlVint(cluster, blockOffset);
-        const timecodeOffset = blockOffset + (trackNumber?.length ?? 0);
-        const blockEnd = blockOffset + size.value;
-        if (trackNumber && timecodeOffset + 2 <= blockEnd && blockEnd <= cluster.length) {
-          maxRelativeTimecode = Math.max(maxRelativeTimecode, cluster.readInt16BE(timecodeOffset));
-        }
-      }
-      offset = cluster.indexOf(marker, offset + 1);
+function inspectClusterTimecodes(cluster: Buffer): {
+  baseTimecode: number;
+  range: { minimum: number; maximum: number } | null;
+} {
+  let baseTimecode = 0;
+  let minimum = Number.POSITIVE_INFINITY;
+  let maximum = Number.NEGATIVE_INFINITY;
+  let offset = 0;
+  while (offset < cluster.length) {
+    const element = readEbmlElement(cluster, offset);
+    if (!element) break;
+    if (element.id === 0xe7) baseTimecode = readUnsignedInteger(cluster, element.dataOffset, element.endOffset);
+    if (element.id === 0xa3) {
+      const timecode = readBlockTimecode(cluster, element.dataOffset, element.endOffset);
+      if (timecode !== null) { minimum = Math.min(minimum, timecode); maximum = Math.max(maximum, timecode); }
     }
+    if (element.id === 0xa0) {
+      let childOffset = element.dataOffset;
+      while (childOffset < element.endOffset) {
+        const child = readEbmlElement(cluster, childOffset, element.endOffset);
+        if (!child) break;
+        if (child.id === 0xa1) {
+          const timecode = readBlockTimecode(cluster, child.dataOffset, child.endOffset);
+          if (timecode !== null) { minimum = Math.min(minimum, timecode); maximum = Math.max(maximum, timecode); }
+        }
+        childOffset = child.endOffset;
+      }
+    }
+    offset = element.endOffset;
   }
-  return maxRelativeTimecode;
+  return {
+    baseTimecode,
+    range: Number.isFinite(minimum) && Number.isFinite(maximum) ? { minimum, maximum } : null,
+  };
+}
+
+function readEbmlElement(buffer: Buffer, offset: number, limit = buffer.length): {
+  id: number;
+  dataOffset: number;
+  endOffset: number;
+} | null {
+  const id = readEbmlId(buffer, offset);
+  if (!id) return null;
+  const size = readEbmlVint(buffer, offset + id.length);
+  if (!size) return null;
+  const dataOffset = offset + id.length + size.length;
+  const endOffset = dataOffset + size.value;
+  if (dataOffset > limit || endOffset > limit || endOffset <= offset) return null;
+  return { id: id.value, dataOffset, endOffset };
+}
+
+function readEbmlId(buffer: Buffer, offset: number): { value: number; length: number } | null {
+  const first = buffer[offset];
+  if (first === undefined || first === 0) return null;
+  let mask = 0x80;
+  let length = 1;
+  while (length <= 4 && (first & mask) === 0) { mask >>= 1; length += 1; }
+  if (length > 4 || offset + length > buffer.length) return null;
+  let value = first;
+  for (let index = 1; index < length; index += 1) value = value * 256 + (buffer[offset + index] ?? 0);
+  return { value, length };
+}
+
+function readUnsignedInteger(buffer: Buffer, start: number, end: number): number {
+  let value = 0;
+  for (let offset = start; offset < end; offset += 1) value = value * 256 + (buffer[offset] ?? 0);
+  return value;
+}
+
+function readBlockTimecode(buffer: Buffer, start: number, end: number): number | null {
+  const trackNumber = readEbmlVint(buffer, start);
+  if (!trackNumber) return null;
+  const timecodeOffset = start + trackNumber.length;
+  if (timecodeOffset + 2 > end) return null;
+  return buffer.readInt16BE(timecodeOffset);
 }

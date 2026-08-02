@@ -7,6 +7,8 @@
     "node": ">=20"
   },
   "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:api": "vitest run --config vitest.api.config.ts"

@@ -1,12 +1,11 @@
 import { demoRepository } from "../../data/demoRepository";
-import type { EvaluationResult, FrameworkId, TrainingAttempt } from "./model";
-import { l2ProjectExercise } from "./content";
+import type { EvaluationResult, FrameworkId, InputMode, TrainingAttempt } from "./model";
+import { getStructuredExercise } from "./content";
 
-function createId() { return typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `attempt-${Date.now()}`; }
-
-export function createAttempt(frameworkId: FrameworkId, options?: { retryOf?: string; focusIssue?: string }): TrainingAttempt {
+export function createLocalAttempt(id: string, frameworkId: FrameworkId, exerciseId: string, inputMode: InputMode, options?: { retryOf?: string; focusIssue?: string }): TrainingAttempt {
   const now = new Date().toISOString();
-  const attempt: TrainingAttempt = { id: createId(), schemaVersion: 1, userId: "demo-user", exerciseId: l2ProjectExercise.id, exerciseVersion: l2ProjectExercise.version, frameworkId, stage: "preparing", recordingState: "idle", preparationRemaining: l2ProjectExercise.preparationSeconds, recordingElapsed: 0, retryOf: options?.retryOf, focusIssue: options?.focusIssue, createdAt: now, updatedAt: now };
+  const exercise = getStructuredExercise(exerciseId);
+  const attempt: TrainingAttempt = { id, schemaVersion: 2, userId: "demo-user", exerciseId: exercise.id, exerciseVersion: exercise.version, frameworkId, inputMode, stage: "preparing", recordingState: "idle", preparationRemaining: exercise.preparationSeconds, recordingElapsed: 0, retryOf: options?.retryOf, focusIssue: options?.focusIssue, createdAt: now, updatedAt: now };
   return demoRepository.saveAttempt(attempt);
 }
 export function getAttempt(id: string | null) { return demoRepository.getAttempt(id); }

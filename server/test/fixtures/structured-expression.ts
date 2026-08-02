@@ -65,7 +65,8 @@ export function createReviewedTranscriptFixture(
     ...segment,
   }));
   const base: Transcript = {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    inputMode: "voice",
     id: "transcript-structured-demo-001",
     attemptId: STRUCTURED_EXPRESSION_ATTEMPT_ID,
     status: "user-reviewed",

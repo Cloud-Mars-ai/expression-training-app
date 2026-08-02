@@ -109,7 +109,8 @@ export async function transcribeAttempt(options: TranscribeAttemptOptions): Prom
     const timestamp = now().toISOString();
 
     return {
-      schemaVersion: 1,
+      schemaVersion: 2,
+      inputMode: "voice",
       id: options.transcriptId ?? `transcript-${options.attemptId}`,
       attemptId: options.attemptId,
       status: "provider-draft",

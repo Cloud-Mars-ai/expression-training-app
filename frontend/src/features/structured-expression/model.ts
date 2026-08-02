@@ -1,6 +1,6 @@
-import type { Attempt, AttemptState, DimensionScore, Evaluation, EvidenceSpan, FrameworkId, RecordingState } from "../../domain/models";
+import type { Attempt, AttemptState, DimensionScore, Evaluation, EvidenceSpan, FrameworkId, InputMode, RecordingState } from "../../domain/models";
 
-export type { AttemptState, DimensionScore, EvidenceSpan, FrameworkId, RecordingState };
+export type { AttemptState, DimensionScore, EvidenceSpan, FrameworkId, InputMode, RecordingState };
 export type AttemptStage = AttemptState;
 export type TrainingAttempt = Attempt;
 export type EvaluationResult = Extract<Evaluation, { status: "scorable" }>;
@@ -17,7 +17,7 @@ export type FrameworkOption = {
 export type StructuredExercise = {
   id: string;
   version: string;
-  level: "L2";
+  level: "L1" | "L2" | "L3" | "L4";
   title: string;
   prompt: string;
   scene: string;

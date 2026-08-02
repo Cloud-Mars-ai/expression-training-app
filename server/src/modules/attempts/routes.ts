@@ -22,7 +22,8 @@ const idSchema = z.string().min(1).max(200);
 const createAttemptSchema = z.object({
   exerciseId: idSchema,
   exerciseVersionId: idSchema,
-  frameworkId: z.enum(["PREP", "STAR"]).optional(),
+  frameworkId: z.enum(["PREP", "STAR", "SCQA"]).optional(),
+  inputMode: z.enum(["voice", "text"]).default("voice"),
   retryOfAttemptId: idSchema.optional(),
   focusIssueId: idSchema.optional(),
   locale: z.literal("zh-CN"),
@@ -30,7 +31,7 @@ const createAttemptSchema = z.object({
 });
 const updateStatusSchema = z.object({
   expectedStatusVersion: z.number().int().positive(),
-  status: z.enum(["permission-check", "recording", "cancelled"]),
+  status: z.enum(["permission-check", "text-entry", "recording", "cancelled"]),
   clientEventAt: z.iso.datetime(),
 });
 const paramsSchema = z.object({ id: idSchema });
@@ -41,6 +42,7 @@ export type AttemptsRoutesOptions = {
   readers?: AttemptAggregateReaders;
   clock?: () => Date;
   createId?: () => string;
+  onAudioUploaded?: (input: { attemptId: string; ownerId: string }) => Promise<void>;
 };
 
 export const attemptsRoutes: FastifyPluginAsync<AttemptsRoutesOptions> = async (app, options) => {
@@ -88,6 +90,7 @@ export const attemptsRoutes: FastifyPluginAsync<AttemptsRoutesOptions> = async (
       exerciseId: parsed.exerciseId,
       exerciseVersionId: parsed.exerciseVersionId,
       ...(parsed.frameworkId ? { frameworkId: parsed.frameworkId } : {}),
+      inputMode: parsed.inputMode,
       ...(parsed.retryOfAttemptId ? { retryOfAttemptId: parsed.retryOfAttemptId } : {}),
       ...(parsed.focusIssueId ? { focusIssueId: parsed.focusIssueId } : {}),
       locale: parsed.locale,
@@ -139,6 +142,11 @@ export const attemptsRoutes: FastifyPluginAsync<AttemptsRoutesOptions> = async (
     if (replay) return sendStoredResponse(reply, replay.responseStatus, replay.responseBody);
 
     const attempt = await service.uploadAudio(ownerId, id, upload);
+    if (options.onAudioUploaded) {
+      queueMicrotask(() => {
+        void options.onAudioUploaded?.({ attemptId: id, ownerId }).catch(() => undefined);
+      });
+    }
     const response = successResponse(attempt, request, clock);
     const serialized = JSON.stringify(response);
     idempotency.save({

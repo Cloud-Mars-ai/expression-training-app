@@ -1,8 +1,17 @@
-import { ArrowLeft, Layers3 } from "lucide-react";
+import { ArrowRight, Clock3, MessageCircleQuestion } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { PlaceholderPanel } from "../components/layout/PlaceholderPanel";
+import { researchTopics, getStructuredExercise } from "../features/structured-expression/content";
+
+const capabilityMeta = {
+  retelling: { level: "L1", title: "精准复述", subtitle: "READ → REPEAT → SUMMARY", description: "先限时默读，隐藏材料后复述，再用不超过 30 字的一句话缩句。", categories: ["写作方法迁移"] },
+  scenario: { level: "L3", title: "情境回应", subtitle: "拒绝 · 发声 · 回应", description: "在真实关系和边界中限时回答，再处理连续追问。", categories: ["生活化讨论", "校园与个人成长", "求职与初入职场"] },
+  impromptu: { level: "L4", title: "即兴表达", subtitle: "观点议题 · 关键词", description: "快速构思后立即表达观点，再回应最多三轮追问。", categories: ["经典辩论", "社会讨论"] },
+} as const;
 
 export function TrainingCapabilityPlaceholder() {
   const { capability } = useParams();
-  return <div className="page-container"><Link className="inline-flex items-center gap-2 text-sm font-semibold text-ink-soft hover:text-ink" to="/training"><ArrowLeft size={17} /> 返回训练中心</Link><PlaceholderPanel eyebrow={`Capability · ${capability?.toUpperCase() ?? "LEVEL"}`} title="能力详情布局已就绪" description="后续会在这里接入筛选、练习卡片、推荐状态和开始训练操作。" icon={<Layers3 size={27} />} /></div>;
+  const meta = capabilityMeta[capability as keyof typeof capabilityMeta];
+  if (!meta) return <div className="page-container"><h2 className="text-xl font-bold">未找到该能力训练</h2><Link className="secondary-button mt-4" to="/training">返回训练中心</Link></div>;
+  const topics = researchTopics.filter((topic) => meta.categories.some((category) => topic.category === category));
+  return <div className="page-container"><section className="training-intro"><div><p className="micro-label text-primary-strong">{meta.level} · {meta.subtitle}</p><h2 className="mt-2 text-2xl font-bold">{meta.title}</h2><p className="mt-2 max-w-xl text-sm leading-6 text-ink-soft">{meta.description}</p></div><span className="level-badge">{topics.length} 题</span></section>{capability === "retelling" && <section className="mt-6 grid grid-cols-3 gap-2" aria-label="复述训练步骤">{[["READ", "默读材料"], ["REPEAT", "隐藏后复述"], ["SUMMARY", "30字缩句"]].map(([key, label], index) => <div className="rounded-md border border-line bg-surface p-3" key={key}><span className="text-xs font-extrabold text-primary-strong">{index + 1} · {key}</span><p className="mt-2 text-xs leading-5 text-ink-soft">{label}</p></div>)}</section>}{capability === "scenario" && <Link className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-line bg-surface p-4 shadow-card" to="/microcourse/ask-one-more"><div className="flex items-start gap-3"><MessageCircleQuestion className="mt-0.5 text-primary-strong" size={21} /><div><p className="micro-label text-primary-strong">MICRO COURSE · 3 分钟</p><h3 className="mt-1 font-bold">多问一句：先确认理解，再推动下一步</h3><p className="mt-1 text-xs leading-5 text-ink-soft">包含低质量回应、改写示例与技巧拆解。</p></div></div><ArrowRight className="shrink-0" size={18} /></Link>}{capability === "impromptu" && <div className="input-mode-switch mt-6" aria-label="即兴题目模式"><button className="active" type="button">观点议题</button><button type="button">关键词模式</button></div>}<section className="mt-7"><p className="micro-label text-ink-muted">TOPIC LIBRARY · 研究题库</p><div className="mt-4 grid gap-4">{topics.map((topic) => { const exercise = getStructuredExercise(topic.topic_id); return <article className="exercise-card" key={topic.topic_id}><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="level-badge">{topic.category}</span><span className="status-label"><Clock3 size={13} />准备 {topic.prep_seconds}s · 作答 {topic.answer_seconds}s</span></div><h3 className="mt-3 text-lg font-bold leading-7">{topic.title}</h3><p className="mt-2 text-sm leading-6 text-ink-soft">{topic.prompt}</p><p className="mt-3 text-xs leading-5 text-ink-muted">{topic.scene} · {topic.core_skill} · 推荐 {topic.recommended_format}</p></div><Link className="exercise-action" to={`/exercise/${exercise.id}`}><span>开始</span><ArrowRight size={17} /></Link></article>; })}</div></section></div>;
 }
