@@ -1,0 +1,3 @@
+import { AlertTriangle, RefreshCw } from "lucide-react";
+type ErrorStateProps = { title?: string; message: string; onRetry: () => void };
+export function ErrorState({ title = "暂时加载失败", message, onRetry }: ErrorStateProps) { return <div className="state-panel"><div className="state-icon state-icon-danger"><AlertTriangle aria-hidden="true" size={22} /></div><h3 className="mt-4 text-base font-bold">{title}</h3><p className="mt-2 max-w-sm text-sm leading-6 text-ink-soft">{message}</p><button className="secondary-button mt-5" onClick={onRetry} type="button"><RefreshCw aria-hidden="true" size={16} />重新加载</button></div>; }

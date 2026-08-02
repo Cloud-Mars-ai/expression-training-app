@@ -1,0 +1,3 @@
+import { ListFilter, RotateCcw } from "lucide-react";
+type EmptyStateProps = { title: string; description: string; actionLabel: string; onAction: () => void; icon?: "filter" | "retry" };
+export function EmptyState({ title, description, actionLabel, onAction, icon = "filter" }: EmptyStateProps) { const Icon = icon === "retry" ? RotateCcw : ListFilter; return <div className="state-panel"><div className="state-icon"><Icon aria-hidden="true" size={22} /></div><h3 className="mt-4 text-base font-bold">{title}</h3><p className="mt-2 max-w-sm text-sm leading-6 text-ink-soft">{description}</p><button className="secondary-button mt-5" onClick={onAction} type="button"><Icon aria-hidden="true" size={16} />{actionLabel}</button></div>; }

@@ -1,0 +1,12 @@
+import { ArrowRight, CheckCircle2, Clock3, Goal, Layers3, Mic2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { l2ProjectExercise } from "../features/structured-expression/content";
+
+export function StructuredExerciseDetailPage() {
+  return <div className="mx-auto w-full max-w-[720px] pb-8">
+    <section className="border-b border-line pb-6"><div className="flex flex-wrap items-center gap-2"><span className="level-badge">L2 · 结构化表达</span><span className="status-label"><Clock3 aria-hidden="true" size={14} />约 4 分钟</span></div><h2 className="mt-4 break-words text-2xl font-bold leading-tight">{l2ProjectExercise.title}</h2><p className="mt-3 text-sm leading-6 text-ink-soft">{l2ProjectExercise.scene} · 目标能力：{l2ProjectExercise.targetSkill}</p></section>
+    <section className="py-6"><p className="micro-label text-ink-muted">TASK · 训练任务</p><blockquote className="mt-3 border-l-4 border-primary pl-4 text-xl font-bold leading-8 text-ink">“{l2ProjectExercise.prompt}”</blockquote><div className="mt-5 flex flex-wrap gap-3 text-sm text-ink-soft"><span className="meta-pill"><Clock3 size={15} />准备 30 秒</span><span className="meta-pill"><Mic2 size={15} />表达 60 秒</span><span className="meta-pill"><Layers3 size={15} />PREP 或 STAR</span></div></section>
+    <section className="border-t border-line py-6"><div className="flex items-center gap-2"><Goal className="text-primary-strong" size={20} /><h3 className="text-lg font-bold">成功标准</h3></div><div className="mt-4 grid gap-3 sm:grid-cols-2">{l2ProjectExercise.successCriteria.map((criterion) => <div className="criterion-row" key={criterion.id}><CheckCircle2 className="mt-0.5 shrink-0 text-success" size={18} /><div><h4 className="font-bold leading-5">{criterion.label}</h4><p className="mt-1 text-sm leading-5 text-ink-soft">{criterion.detail}</p></div></div>)}</div></section>
+    <section className="border-t border-line pt-6"><div className="flex items-start gap-3 rounded-md bg-primary-soft p-4"><Mic2 className="mt-0.5 shrink-0 text-primary-strong" size={19} /><div><h3 className="text-sm font-bold text-primary-strong">本次使用模拟录音</h3><p className="mt-1 text-sm leading-5 text-primary-strong/80">不会调用麦克风。计时、暂停、继续、重录与提交行为与真实录音流程一致。</p></div></div><Link className="primary-button mt-6 w-full" to={`/exercise/${l2ProjectExercise.id}/framework`}>选择表达框架 <ArrowRight aria-hidden="true" size={17} /></Link></section>
+  </div>;
+}

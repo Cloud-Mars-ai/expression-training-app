@@ -1,0 +1,17 @@
+node_modules/
+.npm-cache/
+.tmp/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+
+frontend/dist/
+server/var/
+server/storage/
+server/uploads/
+server/*.sqlite
+server/*.sqlite-shm
+server/*.sqlite-wal
+

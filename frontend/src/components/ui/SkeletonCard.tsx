@@ -1,0 +1,1 @@
+export function SkeletonCard() { return <div aria-label="正在加载练习" className="exercise-card animate-pulse"><div className="skeleton-circle" /><div className="flex-1 space-y-3"><div className="skeleton-line w-20" /><div className="skeleton-line w-4/5" /><div className="skeleton-line w-full" /><div className="skeleton-line w-2/5" /></div><div className="skeleton-action" /></div>; }

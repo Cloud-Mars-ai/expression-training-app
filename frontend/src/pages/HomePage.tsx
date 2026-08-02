@@ -1,0 +1,20 @@
+import { ArrowRight, Check, Circle, Clock3, History, RotateCcw, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CapabilityCard } from "../components/ui/CapabilityCard";
+import { ExerciseCard } from "../components/ui/ExerciseCard";
+import { ProgressRing } from "../components/ui/ProgressRing";
+import { SectionHeader } from "../components/ui/SectionHeader";
+import { capabilities, dailyTasks, exercises } from "../data/mockData";
+import { useDemoData } from "../data/useDemoData";
+
+const taskIcons = { new: Sparkles, retry: RotateCcw, review: Clock3 } as const;
+
+export function HomePage() {
+  const data = useDemoData();
+  const recommended = exercises.find((exercise) => exercise.id === "l2-project-contribution") ?? exercises[0];
+  const recentExercises = exercises.filter((exercise) => exercise.status === "completed" || exercise.status === "review").slice(0, 2);
+  const latest = data.recentPractice[0];
+  const completed = data.completionStatus[recommended.id]?.status === "completed";
+  const dailyProgress = completed ? 33 : 0;
+  return <div className="page-container"><section className="daily-hero"><div className="min-w-0 flex-1"><p className="micro-label text-white/60">TODAY · 今日训练</p><h2 className="mt-3 max-w-xl text-2xl font-bold leading-tight text-white sm:text-3xl">今天，把一个重点说清楚。</h2><p className="mt-3 max-w-md text-sm leading-6 text-white/70">完成一次 60 秒项目介绍，结束后会看到证据支持的单点改进建议。</p><Link className="primary-button mt-6 w-fit bg-white text-ink hover:bg-primary-soft" to={`/exercise/${recommended.id}`}><span>{completed ? "再练一次" : "继续训练"}</span><ArrowRight aria-hidden="true" size={17} /></Link></div><ProgressRing tone="success" value={dailyProgress} label="今日完成" size={100} /></section><section className="task-list-panel" aria-label="今日任务"><div className="flex items-center justify-between gap-3"><div><p className="micro-label text-ink-muted">DAILY PLAN · 今日计划</p><h2 className="mt-1 text-lg font-bold">3 个短任务，约 8 分钟</h2></div><span className="text-sm font-semibold text-primary-strong">{completed ? 1 : 0} / 3 完成</span></div><div className="mt-4 divide-y divide-line">{dailyTasks.map((task, index) => { const Icon = taskIcons[task.icon]; const done = completed && index === 0; return <div className="flex min-h-[60px] items-center gap-3 py-3" key={task.label}><div className={`task-check ${done ? "task-check-done" : ""}`}>{done ? <Check aria-hidden="true" size={15} /> : <Icon aria-hidden="true" size={16} />}</div><p className={`min-w-0 flex-1 text-sm font-semibold ${done ? "text-ink-soft line-through" : "text-ink"}`}>{task.label}</p><span className={`status-label ${done ? "status-success" : ""}`}>{done ? "已完成" : task.state}</span></div>; })}</div></section><section className="mt-8"><SectionHeader eyebrow="START PRACTICE · 开始训练" title="按能力选择入口" action={<Link className="text-sm font-semibold text-primary-strong" to="/training">训练中心 <ArrowRight aria-hidden="true" className="ml-1 inline" size={15} /></Link>} /><div className="mt-4 grid gap-3 sm:grid-cols-2">{capabilities.map((capability) => <CapabilityCard capability={capability} key={capability.key} />)}</div></section><section className="mt-8"><SectionHeader eyebrow="RECENT · 最近结果" title="继续巩固已经练过的能力" action={<span className="text-xs text-ink-muted">{data.recentPractice.length} 条本地记录</span>} />{latest ? <Link className="mt-4 result-history-row" to={`/result/${latest.attemptId}`}><div className="icon-tile bg-primary-soft text-primary-strong"><History size={20} /></div><div className="min-w-0 flex-1"><p className="break-words font-bold">{latest.title}</p><p className="mt-1 text-sm text-ink-soft">{latest.isRetry ? "聚焦重练" : "首次练习"} · 记录已保存</p></div><strong>{latest.score}</strong></Link> : <div className="mt-4 grid gap-3">{recentExercises.map((exercise) => <ExerciseCard exercise={exercise} key={exercise.id} />)}</div>}</section><div className="mt-8 flex items-start gap-3 rounded-md border border-primary/20 bg-primary-soft p-4"><Circle className="mt-0.5 shrink-0 text-primary-strong" size={18} /><p className="text-sm leading-6 text-primary-strong">训练结果、筛选和复习项目保存在当前浏览器。你可以在“我的”中查看隐私偏好或重置演示数据。</p></div></div>;
+}
