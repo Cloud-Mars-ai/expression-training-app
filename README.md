@@ -1,8 +1,8 @@
-# 言序 · YANXU Express
+# 拾语 · YANXU Express
 
 > 把“我大概知道怎么说”，练成“我能清楚地说出来”。
 
-言序是一款面向大学生与初入职场人群的 AI 表达训练应用。选择一道真实议题，用 PREP、STAR 等框架组织思路，通过语音或文字完成一次短练习；系统会基于用户确认后的回答，给出带原文证据的优势、优先改进建议和聚焦重练任务。
+拾语是一款面向大学生与初入职场人群的 AI 表达训练应用。选择一道真实议题，用 PREP、STAR 等框架组织思路，通过语音或文字完成一次短练习；系统会基于用户确认后的回答，给出带原文证据的优势、优先改进建议和聚焦重练任务。
 
 <p>
   <img alt="React" src="https://img.shields.io/badge/React-应用前端-149ECA?logo=react&logoColor=white" />
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/home-morandi.png" alt="言序淡黄莫兰迪主题首页" width="920" />
+  <img src="docs/screenshots/home-morandi.png" alt="拾语淡黄莫兰迪主题首页" width="920" />
 </p>
 
 ## 不只给一个分数，而是告诉你下一次怎么说
